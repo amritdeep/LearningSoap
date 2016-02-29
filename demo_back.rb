@@ -1,11 +1,8 @@
 require 'savon'
 require "gyoku"
 require 'pry'
+require 'csv'
 
-# class Demo
-
-
-# end
 # client = Savon.client(wsdl: "http://mail.frontierutilities.com:50388/EnrollAPI/WebAPI.asmx?wsdl")
 client = Savon.client do
   wsdl "http://mail.frontierutilities.com:50388/EnrollAPI/WebAPI.asmx?wsdl"
@@ -15,20 +12,27 @@ client = Savon.client do
 end
 
 ## Authentication
-response = client.call(:authentication, message: { 
-	'Authenticate' => {
-		'UserName' => 'CMU_01',
-		'Password' => 'UjtE5581'
-	}
-	})
+message = { 'Authenticate' => { 'UserName' => 'CMU_01', 'Password' => 'UjtE5581' } }
+response = client.call(:authentication, message: message)
 
 session_id = response.body[:authentication_response][:authentication_result][:session_id]
 data = client.call(:get_products, message: { 'SessionID' => session_id })
 
 product_details = data.body[:get_products_response][:get_products_result][:product_details][:product_details]
 
-product_details.each do |product|
-	puts product[:product_title]
+id = []
+title = []
+description = []
+
+CSV.open("details.csv", "wb") do |csv|
+	product_details.each do |product|
+		id = product[:product_id]
+		title = product[:product_title]
+		description =product[:product_description]
+		csv << [id, title, description]	
+	end
 end
+
+puts title
 
 
