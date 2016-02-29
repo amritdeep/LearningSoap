@@ -36,5 +36,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  gyoku
   pry
   savon
